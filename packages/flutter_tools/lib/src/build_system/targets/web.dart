@@ -441,10 +441,11 @@ class WebBuiltInAssets extends Target {
 
 /// Generate a service worker for a web target.
 class WebServiceWorker extends Target {
-  const WebServiceWorker(this.fileSystem, this.cache);
+  const WebServiceWorker(this.fileSystem, this.cache, {this.baseHref});
 
   final FileSystem fileSystem;
   final Cache cache;
+  final String? baseHref;
 
   @override
   String get name => 'web_service_worker';
@@ -513,6 +514,7 @@ class WebServiceWorker extends Target {
           'assets/FontManifest.json',
       ],
       serviceWorkerStrategy: serviceWorkerStrategy,
+      baseHref: baseHref,
     );
     serviceWorkerFile
       .writeAsStringSync(serviceWorker);

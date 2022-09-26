@@ -21,10 +21,12 @@ String generateServiceWorker(
   Map<String, String> resources,
   List<String> coreBundle, {
   required ServiceWorkerStrategy serviceWorkerStrategy,
+  String? baseHref,
 }) {
   if (serviceWorkerStrategy == ServiceWorkerStrategy.none) {
     return '';
   }
+  final String originSuffix = baseHref != null ? baseHref.substring(0, baseHref.length - 1) : '';
   return '''
 'use strict';
 const MANIFEST = 'flutter-app-manifest';
@@ -73,7 +75,7 @@ self.addEventListener("activate", function(event) {
         return;
       }
       var oldManifest = await manifest.json();
-      var origin = self.location.origin;
+      var origin = self.location.origin + '$originSuffix';
       for (var request of await contentCache.keys()) {
         var key = request.url.substring(origin.length + 1);
         if (key == "") {
@@ -112,7 +114,7 @@ self.addEventListener("fetch", (event) => {
   if (event.request.method !== 'GET') {
     return;
   }
-  var origin = self.location.origin;
+  var origin = self.location.origin + '$originSuffix';
   var key = event.request.url.substring(origin.length + 1);
   // Redirect URLs to the index.html
   if (key.indexOf('?v=') != -1) {
